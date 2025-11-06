@@ -8,8 +8,13 @@ showing their patient_id, name, age, and satisfaction score */
 
 select patient_id, name, age,  satisfaction  from patient where service='surgery' and satisfaction < 70;
 
-/*Retrieve the top 5 weeks with the highest patient refusals across all services,
+/* Day 3 Retrieve the top 5 weeks with the highest patient refusals across all services,
 showing week, service, patients_refused, and patients_request. 
 Sort by patients_refused in descending order*/
 select week, service, patients_refused, 
 patients_request from services_weekly order by patients_refused desc limit 5;
+
+/* Day 4 Find the 3rd to 7th highest patient satisfaction scores from the patients table, showing patient_id, 
+name, service, and satisfaction. Display only these 5 records */
+select  patient_id,  name, service,  satisfaction 
+from patient order by satisfaction  desc offset 2 limit 10;
