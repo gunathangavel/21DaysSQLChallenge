@@ -18,3 +18,12 @@ patients_request from services_weekly order by patients_refused desc limit 5;
 name, service, and satisfaction. Display only these 5 records */
 select  patient_id,  name, service,  satisfaction 
 from patient order by satisfaction  desc offset 2 limit 10;
+
+/* ** Day 5 ** Calculate the total number of patients admitted, total patients refused,
+and the average patient satisfaction across all services and weeks.
+Round the average satisfaction to 2 decimal places. */
+ 
+select sum(patients_admitted) as patients_admitted ,sum(patients_refused) as patients_refused,
+ round(avg(patient_satisfaction),2) avg_satisfaction from services_weekly;
+
+ 
