@@ -80,5 +80,13 @@ end	 AS performance_category
 from services_weekly group by service
 order by avg(patient_satisfaction) desc;
 
+/* Day 11 ** Find all unique combinations of service and event type from the services_weekly table
+where events are not null or none, along with the count of occurrences for each combination. 
+Order by count descending */
+
+select service, event , count(*) from services_weekly
+where event is not null and event <> 'none'
+group by service, event
+order by count(*) desc;
 
 
