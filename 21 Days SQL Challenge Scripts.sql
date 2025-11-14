@@ -65,6 +65,20 @@ select service,count(*), round(avg(departure_date - arrival_date),2) as length_o
 from patient group by service  having avg(departure_date - arrival_date)>7
 order by length_of_stay;
 
+/* Day 10 ** Create a service performance report showing service name, total patients admitted,
+and a performance category based on the following: 'Excellent' if avg satisfaction >= 85, 'Good' if >= 75, 
+'Fair' if >= 65, otherwise 'Needs Improvement'. 
+Order by average satisfaction descending. */
+
+select service,sum(patients_admitted) AS total_patients_admitted,
+round(avg(patient_satisfaction),2) AS avg_satisfaction,
+case when avg(patient_satisfaction) >= 85 then 'Excellent'
+	 when avg(patient_satisfaction) >= 75 then 'Good'
+	 when avg(patient_satisfaction) >= 65 then 'Fair'
+	 else 'Needs Improvement'
+end	 AS performance_category
+from services_weekly group by service
+order by avg(patient_satisfaction) desc;
 
 
- 
+
