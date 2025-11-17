@@ -89,4 +89,33 @@ where event is not null and event <> 'none'
 group by service, event
 order by count(*) desc;
 
+/*  ** Day 12 ** Analyze the event impact by comparing weeks with events vs weeks without events. 
+Show: event status ('With Event' or 'No Event'), count of weeks, average patient satisfaction, 
+and average staff morale. 
+Order by average patient satisfaction descending. */
+
+select count(*) as event_count, round(avg(patient_satisfaction)) as avg_pt_satisfaction, 
+round(avg(staff_morale)) as avg_staff_morale,
+case when event = 'none' then 'No Event' else 'With Event' end as event_type 
+from services_weekly
+group by event_type order by avg_pt_satisfaction;
+
+/* ** Day 13 ** Create a comprehensive report showing patient_id, patient name, age, service, 
+and the total number of staff members available in their service. Only include patients from services
+that have more than 5 staff members. Order by number of staff descending, then by patient name. */
+
+select patient_id, name ,age,p.service, count(s.staff_id) as staff_count 
+from patient p join staff s on p.service = s.service
+group by patient_id,name , age,p.service 
+having count(s.staff_id) > 5 order by staff_count desc, name;
+
+/* Day 14 ** Create a staff utilisation report showing all staff members (staff_id, staff_name, role, service)
+and the count of weeks they were present (from staff_schedule). 
+Include staff members even if they have no schedule records. 
+Order by weeks present descending. */
+
+select s.staff_id,s.staff_name,s.role,s.service, 
+count(case when ss.present =false then ss.week end) as week_count
+from staff s left join staff_schedule ss on s.staff_id = ss.staff_id
+group by s.staff_id,s.staff_name,s.role,s.service;
 
