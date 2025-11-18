@@ -119,3 +119,16 @@ count(case when ss.present =false then ss.week end) as week_count
 from staff s left join staff_schedule ss on s.staff_id = ss.staff_id
 group by s.staff_id,s.staff_name,s.role,s.service;
 
+/* ** Day 15 ** Create a comprehensive service analysis report for week 20 showing: service name,
+total patients admitted that week, total patients refused, average patient satisfaction,
+count of staff assigned to service, and count of staff present that week. 
+Order by patients admitted descending */
+
+select sw.service,sum(patients_admitted) as total_patients_admitted,
+sum(patients_refused) as total_patients_refused,
+round(avg(patient_satisfaction),2) as avg_patient_satisfaction,
+count(staff_id) as total_staff,
+sum(case when present=true then 1 else 0 end) as total_staff_present
+from services_weekly sw join staff_schedule ss on sw.service = ss.service
+where sw.week=20 group by sw.service
+order by total_patients_admitted desc;
