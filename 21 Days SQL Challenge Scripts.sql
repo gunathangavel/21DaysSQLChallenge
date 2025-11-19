@@ -132,3 +132,17 @@ sum(case when present=true then 1 else 0 end) as total_staff_present
 from services_weekly sw join staff_schedule ss on sw.service = ss.service
 where sw.week=20 group by sw.service
 order by total_patients_admitted desc;
+
+
+/* ** Day 16 **Find all patients who were admitted to services that had at least one week
+where patients were refused AND the average patient satisfaction 
+for that service was below the overall hospital average satisfaction. 
+Show patient_id, name, service, and their personal satisfaction score. */
+
+select patient_id, name,service,satisfaction from patient where service in
+( select service from services_weekly where patients_refused is not null 
+group by service 
+having avg(patient_satisfaction) < 
+(select avg(patient_satisfaction) from services_weekly));
+
+
