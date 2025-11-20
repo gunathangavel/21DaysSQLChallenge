@@ -145,4 +145,25 @@ group by service
 having avg(patient_satisfaction) < 
 (select avg(patient_satisfaction) from services_weekly));
 
+/* ** Day 17 **Create a report showing each service with: service name, total patients admitted, 
+the difference between their total admissions and the average admissions across all services, 
+and a rank indicator ('Above Average', 'Average', 'Below Average').
+Order by total patients admitted descending. */
 
+select service, sum(patients_Admitted) as total_patients_admitted,
+round( sum(patients_Admitted) - (select avg(patients_admitted)),2) as difference_patient_admision,
+case when ( sum(patients_Admitted) - (select avg(patients_admitted))) < 1000 then 'Below Average'
+	when ( sum(patients_Admitted) - (select avg(patients_admitted))) between 1000 and 2000 then 'Average'
+	when ( sum(patients_Admitted) - (select avg(patients_admitted))) > 2000 then 'Above Average' 
+end 
+from services_weekly group by service 
+order by total_patients_admitted desc;
+
+/* ** Day18 ** Create a comprehensive personnel and patient list showing: identifier (patient_id or staff_id),
+full name, type ('Patient' or 'Staff'), and associated service.
+Include only those in 'surgery' or 'emergency' services.
+Order by type, then service, then name */
+
+select patient_id as id,name,'Patient' as type, service from patient where service in ('surgery','emergency')
+union
+select staff_id as id, staff_name as name, 'Staff' as type ,service from staff where service in ('surgery','emergency');
