@@ -166,4 +166,5 @@ Order by type, then service, then name */
 
 select patient_id as id,name,'Patient' as type, service from patient where service in ('surgery','emergency')
 union
-select staff_id as id, staff_name as name, 'Staff' as type ,service from staff where service in ('surgery','emergency');
+select staff_id as id, staff_name as name, 'Staff' as type ,service from staff where service in ('surgery','emergency')
+order by type,service,name;
