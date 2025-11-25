@@ -168,3 +168,64 @@ select patient_id as id,name,'Patient' as type, service from patient where servi
 union
 select staff_id as id, staff_name as name, 'Staff' as type ,service from staff where service in ('surgery','emergency')
 order by type,service,name;
+
+/* ** Day 19 **
+For each service, rank the weeks by patient satisfaction score (highest first). 
+Show service, week, patient_satisfaction, patients_admitted, and the rank. 
+Include only the top 3 weeks per service. */ 
+
+select * from (select service, week,patient_satisfaction, patients_admitted,
+rank() over( partition by service order by patient_satisfaction desc) as rank1
+from services_Weekly) as ranked
+where rank1 < 4;
+
+/* ** Day 20 ** Create a trend analysis showing for each service and week:
+week number, patients_admitted, running total of patients admitted (cumulative),
+3-week moving average of patient satisfaction (current week and 2 prior weeks), 
+and the difference between current week admissions and the service average.
+Filter for weeks 10-20 only. */
+
+select service,week,patients_admitted,
+sum(patients_admitted) over(partition by service order by week) as running_total_patients,
+round(avg(patient_satisfaction) over(rows between 2 preceding and current row),2) as moving_avg,
+round(sum(patients_admitted)over(partition by service,week) 
+		- avg(patients_admitted) over(partition by service),2) as admission_diff
+from services_weekly where week between 10 and 20
+order by service,week;
+
+/*  ** Day 21 ** Create a comprehensive hospital performance dashboard using CTEs. Calculate:
+1) Service-level metrics (total admissions, refusals, avg satisfaction), 
+2) Staff metrics per service (total staff, avg weeks present),
+3) Patient demographics per service (avg age, count). 
+Then combine all three CTEs to create a final report showing service name, 
+all calculated metrics, and an overall performance score (weighted average of admission rate and satisfaction).
+Order by performance score descending.*/
+
+with service_metrics as(
+	-- Service-level metrics
+	select service,sum(patients_admitted) as total_admissions,
+	sum(patients_refused) as total_refusals,
+	round(avg(patient_satisfaction),2) as avg_satisfaction
+	from services_weekly group by service),
+
+staff_metrics as (
+	--Staff metrics per service
+	select service,count(staff_id) as total_staff, round(avg(week),2) as avg_week
+	from staff_schedule where present=true group by service),
+
+patient_demo as (
+	--Patient demographics
+	select service,round(avg(age),2) as avg_age,count(patient_id) as patient_count from patient group by service)
+
+select s.service,s.total_admissions,s.total_refusals,s.avg_satisfaction,st.total_staff,st.avg_week,p.avg_age,
+p.patient_count,
+round(
+        (
+            (s.total_admissions::numeric / NULLIF((s.total_admissions + s.total_refusals),0)) * 0.6
+            + (s.avg_satisfaction / 100.0) * 0.4
+        ) * 100, 2
+    ) AS performance_score
+
+from service_metrics s  join staff_metrics st on s.service = st.service
+	 join patient_demo p on s.service = p.service
+order by performance_score desc;
